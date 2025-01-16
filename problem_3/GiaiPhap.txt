@@ -1,0 +1,25 @@
+Hiệu suất tính toán không cần thiết:
+Vấn đề: getPriority được gọi nhiều lần trong filter và sort, điều này có thể làm giảm hiệu suất, đặc biệt khi số lượng phần tử trong balances rất lớn.
+Giải pháp: Có thể tính toán giá trị ưu tiên một lần và lưu trữ trong một biến, thay vì gọi hàm getPriority nhiều lần.
+
+2. Sử dụng useMemo không hiệu quả:
+Vấn đề: useMemo chỉ có tác dụng khi giá trị trả về của sortedBalances phụ thuộc vào các dependency trong mảng, 
+nhưng cách sortedBalances được tính toán có thể không cần phải memoize vì độ phức tạp của việc tính toán không đủ lớn để hưởng lợi từ useMemo. 
+useMemo nên được sử dụng khi việc tính toán lớn.
+Giải pháp: Nếu không có hiệu suất đáng kể khi không sử dụng useMemo, có thể loại bỏ useMemo và tính toán trực tiếp.
+
+3. Chỉnh sửa lhsPriority và rhsPriority trong sort:
+Vấn đề: Hàm sort được sử dụng trên mảng balances nhưng lại lấy getPriority nhiều lần. Nếu không được xử lý cẩn thận, việc gọi nhiều lần có thể làm mất đi tính hiệu quả của việc sắp xếp.
+Giải pháp: Cũng giống như ở trên, tính toán các giá trị ưu tiên một lần và sử dụng lại trong hàm sort thay vì gọi lại getPriority.
+
+4. Map và toFixed:
+Vấn đề: Sử dụng map hai lần trên sortedBalances, một lần để tạo mảng formattedBalances và lần nữa để tạo mảng rows. Việc này có thể gây tốn tài nguyên.
+Giải pháp: Cả hai thao tác có thể được gộp lại vào một vòng lặp để giảm thiểu chi phí tính toán.
+
+5. Truyền children nhưng không sử dụng:
+Vấn đề: Biến children được truyền vào component WalletPage nhưng không được sử dụng trong thân hàm. Điều này có thể gây lãng phí tài nguyên.
+Giải pháp: Nếu không cần thiết phải sử dụng children, có thể loại bỏ nó khỏi Props.
+
+6. Sử dụng key index trong danh sách:
+Vấn đề: Truyền index làm key cho các phần tử trong rows. Khi danh sách thay đổi động, việc sử dụng index làm key có thể gây lỗi tái sử dụng DOM không chính xác, làm giảm hiệu suất.
+Giải pháp: Nên sử dụng một giá trị duy nhất và ổn định như balance.currency hoặc một ID duy nhất cho key thay vì index
